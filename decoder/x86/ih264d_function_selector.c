@@ -71,7 +71,7 @@ void ih264d_init_function_ptr(dec_struct_t *ps_codec)
         case ARCH_X86_SSE42:
         default:
             ih264d_init_function_ptr_ssse3(ps_codec);
-            ih264d_init_function_ptr_sse42(ps_codec);
+            //ih264d_init_function_ptr_sse42(ps_codec);
         break;
     }
 }

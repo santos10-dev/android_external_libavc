@@ -112,7 +112,7 @@ void ih264e_init_function_ptr(void *pv_codec)
         case ARCH_X86_SSE42:
         default:
             ih264e_init_function_ptr_ssse3(ps_codec);
-            ih264e_init_function_ptr_sse42(ps_codec);
+            //ih264e_init_function_ptr_sse42(ps_codec);
             break;
     }
 }
@@ -136,7 +136,7 @@ void ih264e_init_function_ptr(void *pv_codec)
 */
 IV_ARCH_T ih264e_default_arch(void)
 {
-    return ARCH_X86_SSE42;
+    return ARCH_X86_SSSE3;
 }
 
 

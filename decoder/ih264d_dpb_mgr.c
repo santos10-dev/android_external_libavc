@@ -721,7 +721,7 @@ WORD32 ih264d_ref_idx_reordering(dec_struct_t *ps_dec, UWORD8 uc_lx)
     UWORD16 ui_max_frame_num =
                     ps_dec->ps_cur_sps->u2_u4_max_pic_num_minus1 + 1;
 
-    WORD32 i;
+    WORD32 i, count = 0;
     UWORD32 ui_remapIdc, ui_nextUev;
     WORD16 u2_pred_frame_num = u4_cur_pic_num;
     WORD32 i_temp;
@@ -742,7 +742,8 @@ WORD32 ih264d_ref_idx_reordering(dec_struct_t *ps_dec, UWORD8 uc_lx)
 
     ui_remapIdc = ih264d_uev(pu4_bitstrm_ofst, pu4_bitstrm_buf);
 
-    while(ui_remapIdc != 3)
+    while((ui_remapIdc != 3)
+                    && (count < ps_cur_slice->u1_num_ref_idx_lx_active[uc_lx]))
     {
         ui_nextUev = ih264d_uev(pu4_bitstrm_ofst, pu4_bitstrm_buf);
         if(ui_remapIdc != 2)
@@ -811,6 +812,7 @@ WORD32 ih264d_ref_idx_reordering(dec_struct_t *ps_dec, UWORD8 uc_lx)
 
         ui_remapIdc = ih264d_uev(pu4_bitstrm_ofst, pu4_bitstrm_buf);
         /* Get the remapping_idc - 0/1/2/3 */
+        count++;
     }
 
     //Handle the ref indices that were not remapped
@@ -842,7 +844,7 @@ WORD32 ih264d_ref_idx_reordering(dec_struct_t *ps_dec, UWORD8 uc_lx)
 WORD32 ih264d_read_mmco_commands(struct _DecStruct * ps_dec)
 {
     dec_bit_stream_t *ps_bitstrm = ps_dec->ps_bitstrm;
-    dpb_commands_t *ps_dpb_cmds = ps_dec->ps_dpb_cmds;
+    dpb_commands_t *ps_dpb_cmds = &(ps_dec->s_dpb_cmds_scratch);
     dec_slice_params_t * ps_slice = ps_dec->ps_cur_slice;
     WORD32 j;
     UWORD8 u1_buf_mode;

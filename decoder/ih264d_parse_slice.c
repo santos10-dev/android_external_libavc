@@ -1382,9 +1382,8 @@ WORD32 ih264d_parse_decode_slice(UWORD8 u1_is_idr_slice,
         if(ps_dec->u1_dangling_field == 1)
         {
             ps_dec->u1_second_field = 1 - ps_dec->u1_second_field;
-            ps_cur_slice->u1_bottom_field_flag = u1_bottom_field_flag;
-            ps_dec->u2_prv_frame_num = u2_frame_num;
             ps_dec->u1_first_slice_in_stream = 0;
+            ps_dec->u1_top_bottom_decoded = TOP_FIELD_ONLY | BOT_FIELD_ONLY;
             return ERROR_DANGLING_FIELD_IN_PIC;
         }
 
@@ -1827,7 +1826,7 @@ WORD32 ih264d_parse_decode_slice(UWORD8 u1_is_idr_slice,
         ps_dec->ps_cur_pic->u4_pack_slc_typ |= I_SLC_BIT;
 
         ret = ih264d_parse_islice(ps_dec, u2_first_mb_in_slice);
-
+        ps_dec->u1_pr_sl_type = u1_slice_type;
         if(ps_dec->i4_pic_type != B_SLICE && ps_dec->i4_pic_type != P_SLICE)
             ps_dec->i4_pic_type = I_SLICE;
 
@@ -1858,6 +1857,15 @@ WORD32 ih264d_parse_decode_slice(UWORD8 u1_is_idr_slice,
 
     if(ret != OK)
         return ret;
+
+    if(u1_nal_ref_idc != 0)
+    {
+        if(!ps_dec->ps_dpb_cmds->u1_dpb_commands_read)
+        {
+            memcpy((void *)ps_dec->ps_dpb_cmds, (void *)(&(ps_dec->s_dpb_cmds_scratch)),
+                   sizeof(dpb_commands_t));
+        }
+    }
 
     /* storing last Mb X and MbY of the slice */
     ps_dec->i2_prev_slice_mbx = ps_dec->u2_mbx;
